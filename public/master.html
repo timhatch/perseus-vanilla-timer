@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<head>
+  <meta charset='utf-8'>
+  <title>Master Timer</title>
+  <link href='./content.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <div id='inner'></div>
+  <script src='./lib/ServerDate.js'></script>
+  <script src='./lib/underscore-1.8.3.min.js'></script>
+  <script src='./lib/backbone-1.3.3.min.js'></script>
+  <script src='./lib/backbone-nativeview-0.3.3.min.js'></script>
+  <script src='./timer.js'></script>
+  <script src='./timerview.js'></script>
+  <script>
+    // Launch the timer when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', function(){
+      var clock = new App.TimerView({ 
+        'duration': 240, 
+        'el'      : document.getElementById('inner'), 
+        'type'    : 'countdownTimer' 
+      })
+      // Use a 'keydown' event to work with remotes that simulate keypresses
+      // Use a 'click' or 'dblclick' event to work with mouse input 
+      // Send a the current time to synchronise clock starts/ends based on the click event
+      document.addEventListener('click', function(){
+        var time   = ServerDate.now()
+        var client = new XMLHttpRequest()
+        client.open('POST', '/timers/reset')
+        client.send(time)
+      })
+    }, false)
+  </script>
+</body>
