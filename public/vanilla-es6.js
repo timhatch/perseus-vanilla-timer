@@ -117,21 +117,36 @@ class CountdownTimer extends TimerView {
   
   constructor(options) {
     super(options)
-    
+    // run the clock
+    // const hiResTime      = performance.now()      // (float) milliseconds
+    // this.model.startTime = Date.now() - hiResTime // (float) milliseconds
+    // this.clock = this.run.bind(this)
+    // this.clock(/*TIME*/)
+  }
+
+  // React to any Server Sent Event message fired by the server
+  handleESMessage(eventsource) {
+    const start    = parseFloat(eventsource.data)                               // (int) milliseconds
+    this.model.end = ((this.model.end - start) > 0 ? 0 : (this.model.rotation * 1000) + 999)
   }
   
   // Commanded countdown timer
   // TODO: Check seconds vs milliseconds
   run(timestamp) {
-    const currentTime = this.model.startTime + timestamp
-    const remaining   = (this.model.startTime + 1000 * this.model.rotation) 
-      - (this.model.startTime + timestamp)
+    // var diff      = this.end - ServerDate.now() 
+    // var remaining = diff > 0 ? diff : 0 
+    // var min       = Math.floor(remaining/60000) 
+    // 
+    // const currentTime = this.model.startTime + timestamp
+    // const remaining   = (this.model.startTime + 1000 * this.model.rotation) 
+    //   - (this.model.startTime + timestamp)
       
     if (Math.floor(remaining) !== Math.floor(this.model.remaining)) {
       this.model.remaining = remaining
       this.updateClock()
+      this.playSound()
     }
     
-    requestAnimationFrame(this.run)
+    requestAnimationFrame(this.clock)
   }
 }
