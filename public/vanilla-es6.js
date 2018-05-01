@@ -19,26 +19,12 @@
 // - does not support es6 in the browser, so transpilation of this code is required
 // - does not support toLocaleString
 
-class TimerView {
-  
-  constructor(options) {
-    // If webAudio is supported, instantiate audio signals
-    this.supportsAudio = window.AudioContext || window.webkitAudioContext
-    if (this.supportsAudio) {
-      this.audioCTX = new this.supportsAudio()
-      this.beep1    = this.createAudio(425)  // The 5 second warning 
-      this.beep2    = this.createAudio(600)  // Commencement of rotation & 1 min warning
-    }
-    
-    // Instantiate the timer model
-    const time = options.seconds || 300
-    this.model = { rotation: time, remaining: time }
-
-    // Set the font and line heights
-    const viewportHeight     = document.documentElement.clientHeight
-    this.el                  = document.getElementById('inner')
-    this.el.style.lineHeight = (1.0 * viewportHeight)+'px'
-    this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
+class AudioSignal {
+  // Create an audio object with a play method and two playable tones
+  constructor(audioContext) {
+    this.audioCTX = new audioContext()
+    this.beep1    = this.createAudio(425)  // The 5 second warning 
+    this.beep2    = this.createAudio(600)  // Commencement of rotation & 1 min warning
   }
 
   // Create an Audio Graph comprising a square wave oscillator and an amplifier
@@ -58,18 +44,40 @@ class TimerView {
     return amplifier 
   }
 
-  // "Play" a sound by adjusting the amplifier gain
+  // "Play" a specified signal by adjusting the amplifier gain
+  // @tone      - the signal to play
+  // @duration  - the duration of the signal
   play(tone, duration) {
     tone.gain.setValueAtTime(1, this.audioCTX.currentTime)
     tone.gain.setValueAtTime(0, this.audioCTX.currentTime + duration/1000)
   }
+}
+
+class TimerView {
+  
+  constructor(options) {
+    // If webAudio is supported, instantiate audio signals
+    const audioContext = window.AudioContext || window.webkitAudioContext
+    this.audio = audioContext ? new AudioSignal(audioContext) : null 
+    
+    // Instantiate the timer model
+    const time = options.seconds || 300
+    this.model = { rotation: time, remaining: time }
+
+    // Set the font and line heights
+    const viewportHeight     = document.documentElement.clientHeight
+    this.el                  = document.getElementById('inner')
+    this.el.style.lineHeight = (1.0 * viewportHeight)+'px'
+    this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
+  }
 
   // Play audio signals
   playSound() {
+    var a = this.audio
     var t = Math.floor(this.model.remaining)  // (int) seconds
-    if (this.supportsAudio) {
-      if (t === 0 || t === 60 || t === this.model.rotation) this.play(this.beep2, 666)
-      if (t < 6 && t > 0) this.play(this.beep1, 333)
+    if (this.audio) {
+      if (t === 0 || t === 60 || t === this.model.rotation) a.play(a.beep2, 666)
+      if (t < 6 && t > 0) a.play(a.beep1, 333)
     }
   }
 
