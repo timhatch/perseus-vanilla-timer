@@ -21,10 +21,9 @@
 
 class AudioSignal {
   // Create an audio object with a play method and two playable tones
-  constructor(audioContext) {
+  constructor(audioContext, f) {
     this.audioCTX = new audioContext()
-    this.beep1    = this.createAudio(425)  // The 5 second warning 
-    this.beep2    = this.createAudio(600)  // Commencement of rotation & 1 min warning
+    this.tone     = this.createAudio(f)   
   }
 
   // Create an Audio Graph comprising a square wave oscillator and an amplifier
@@ -45,11 +44,10 @@ class AudioSignal {
   }
 
   // "Play" a specified signal by adjusting the amplifier gain
-  // @tone      - the signal to play
   // @duration  - the duration of the signal
-  play(tone, duration) {
-    tone.gain.setValueAtTime(1, this.audioCTX.currentTime)
-    tone.gain.setValueAtTime(0, this.audioCTX.currentTime + duration/1000)
+  play(duration) {
+    this.tone.gain.setValueAtTime(1, this.audioCTX.currentTime)
+    this.tone.gain.setValueAtTime(0, this.audioCTX.currentTime + duration/1000)
   }
 }
 
@@ -58,7 +56,9 @@ class TimerView {
   constructor(options) {
     // If webAudio is supported, create the required audio signals
     const audioContext = window.AudioContext || window.webkitAudioContext
-    this.audio = audioContext ? new AudioSignal(audioContext) : null 
+    this.audio    = []
+    this.audio[0] = audioContext ? new AudioSignal(audioContext, 425) : null 
+    this.audio[1] = audioContext ? new AudioSignal(audioContext, 600) : null 
     
     // Instantiate the timer model
     const time      = options.seconds || 300  // (int) seconds
@@ -81,16 +81,15 @@ class TimerView {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
       this.updateClock()
-      this.audio && this.playSound()
+      this.audio[0] && this.playSound()
     }
   }
 
   // Play audio signals
   playSound() {
-    const a = this.audio
     const t = Math.floor(this.model.remaining)  // (int) seconds
-    if (t === 0 || t === 60 || t === this.model.rotation) a.play(a.beep2, 666)
-    if (t < 6 && t > 0) a.play(a.beep1, 333)
+    if (t === 0 || t === 60 || t === this.model.rotation) this.audio[1].play(666)
+    if (t < 6 && t > 0) this.audio[0].play(333)
   }
 
   // Update the time display & play any relevant audible signal
