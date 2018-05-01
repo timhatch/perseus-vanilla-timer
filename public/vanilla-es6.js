@@ -92,6 +92,14 @@ class TimerView {
     this.el.textContent = m + ':' + s
     //this.el.textContent = m + ':' + s.toLocaleString('en-US', { minimumIntegerDigits: 2 })
   }
+
+  run(timestamp) {
+    if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
+      this.model.remaining = timestamp
+      this.updateClock()
+      this.playSound()
+    }
+  }
 }
 
 class RotationTimer extends TimerView {
@@ -111,12 +119,8 @@ class RotationTimer extends TimerView {
     const currentTime = (this.model.startTime + timestamp) / 1000                 // (float) seconds
     const remaining   = this.model.rotation - (currentTime % this.model.rotation) // (float) seconds
 
-    if (Math.floor(remaining) !== Math.floor(this.model.remaining)) {
-      this.model.remaining = remaining
-      this.updateClock()
-      this.playSound()
-    }
-
+    super.run(remaining)
+    
     requestAnimationFrame(this.clock)
   }
 }
@@ -147,11 +151,7 @@ class CountdownTimer extends TimerView {
     var diff      = (this.model.end - now) / 1000     // (float) seconds
     var remaining = diff > 0 ? diff : 0 
 
-    if (Math.floor(remaining) !== Math.floor(this.model.remaining)) {
-      this.model.remaining = remaining
-      this.updateClock()
-      this.playSound()
-    }
+    super.run(remaining)
     
     requestAnimationFrame(this.clock)
   }
