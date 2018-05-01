@@ -61,8 +61,9 @@ class TimerView {
     this.audio = audioContext ? new AudioSignal(audioContext) : null 
     
     // Instantiate the timer model
-    const time = options.seconds || 300
-    this.model = { rotation: time, remaining: time }
+    const time      = options.seconds || 300  // (int) seconds
+    const hiResTime = performance.now()       // (float) milliseconds
+    this.model      = { rotation: time, remaining: time, startTime: Date.now() - hiResTime }
 
     // Set the font and line heights
     const viewportHeight     = document.documentElement.clientHeight
@@ -107,10 +108,8 @@ class RotationTimer extends TimerView {
   constructor(options) {
     super(options)
     // run the clock
-    const hiResTime      = performance.now()      // (float) milliseconds
-    this.model.startTime = Date.now() - hiResTime // (float) milliseconds
-    this.clock           = this.run.bind(this)
-    this.clock(hiResTime)
+    this.clock = this.run.bind(this)
+    this.clock(null)
   }
   
   // Rotation countdown timer
@@ -130,10 +129,8 @@ class CountdownTimer extends TimerView {
   constructor(options) {
     super(options)
     // run the clock
-    const hiResTime      = performance.now()      // (float) milliseconds
-    this.model.startTime = Date.now() - hiResTime // (float) milliseconds
-    this.clock           = this.run.bind(this)
-    this.clock(hiResTime)
+    this.clock = this.run.bind(this)
+    this.clock(null)
     // Handle es messages
     const es = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
