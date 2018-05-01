@@ -30,8 +30,8 @@ class AudioSignal {
   // Create an Audio Graph comprising a square wave oscillator and an amplifier
   // @f - a frequency in Hz for the generated tone
   createAudio(f) {
-    var oscillator = this.audioCTX.createOscillator()
-    var amplifier  = this.audioCTX.createGain()
+    const oscillator = this.audioCTX.createOscillator()
+    const amplifier  = this.audioCTX.createGain()
     
     amplifier.gain.value = 0
     amplifier.connect(this.audioCTX.destination)
@@ -56,7 +56,7 @@ class AudioSignal {
 class TimerView {
   
   constructor(options) {
-    // If webAudio is supported, instantiate audio signals
+    // If webAudio is supported, create the required audio signals
     const audioContext = window.AudioContext || window.webkitAudioContext
     this.audio = audioContext ? new AudioSignal(audioContext) : null 
     
@@ -71,35 +71,39 @@ class TimerView {
     this.el.style.lineHeight = (1.0 * viewportHeight)+'px'
     this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
   }
+  
+  // Given a time in seconds, compare it with the stored time remaining on the clock and if
+  // the two are different (a) update the displayed time and (b) if audio is supported play any
+  // relevant audio signal
+  // The point here is to allow the clock to iterate multiple times per second, but only refresh
+  // the display when the number of seconds remaining changes
+  run(timestamp) {
+    if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
+      this.model.remaining = timestamp
+      this.updateClock()
+      this.audio && this.playSound()
+    }
+  }
 
   // Play audio signals
   playSound() {
-    var a = this.audio
-    var t = Math.floor(this.model.remaining)  // (int) seconds
-    if (this.audio) {
-      if (t === 0 || t === 60 || t === this.model.rotation) a.play(a.beep2, 666)
-      if (t < 6 && t > 0) a.play(a.beep1, 333)
-    }
+    const a = this.audio
+    const t = Math.floor(this.model.remaining)  // (int) seconds
+    if (t === 0 || t === 60 || t === this.model.rotation) a.play(a.beep2, 666)
+    if (t < 6 && t > 0) a.play(a.beep1, 333)
   }
 
   // Update the time display & play any relevant audible signal
   // this implementation assume that upDateClock is called only where time remaining
   // *in seconds* changes
   updateClock() {
-    var t = Math.floor(this.model.remaining)  // (int) seconds
-    var m = Math.floor(t / 60)                // (int) minutes
-    var s = t % 60
-    if (s < 10) s = '0'+s
+    const t = Math.floor(this.model.remaining)  // (int) seconds
+    const m = Math.floor(t / 60)                // (int) minutes
+    let   s = t % 60
+
+    if (s < 10) s = '0' + s
     this.el.textContent = m + ':' + s
     //this.el.textContent = m + ':' + s.toLocaleString('en-US', { minimumIntegerDigits: 2 })
-  }
-
-  run(timestamp) {
-    if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
-      this.model.remaining = timestamp
-      this.updateClock()
-      this.playSound()
-    }
   }
 }
 
@@ -113,10 +117,9 @@ class RotationTimer extends TimerView {
   }
   
   // Rotation countdown timer
-  // TODO: Check seconds vs milliseconds
   run(timestamp) {
-    const currentTime = (this.model.startTime + timestamp) / 1000                 // (float) seconds
-    const remaining   = this.model.rotation - (currentTime % this.model.rotation) // (float) seconds
+    const now       = (this.model.startTime + timestamp) / 1000         // (float) seconds
+    const remaining = this.model.rotation - (now % this.model.rotation) // (float) seconds
 
     super.run(remaining)
     
@@ -132,7 +135,7 @@ class CountdownTimer extends TimerView {
     this.clock = this.run.bind(this)
     this.clock(null)
     // Handle es messages
-    const es = new EventSource('/timers/reset')
+    const es     = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
   }
 
@@ -146,7 +149,7 @@ class CountdownTimer extends TimerView {
   run(timestamp) {
     const now       = this.model.startTime + timestamp  // (float) milliseconds
     const diff      = (this.model.end - now) / 1000     // (float) seconds
-    const remaining = diff > 0 ? diff : 0 
+    const remaining = diff > 0 ? diff : 0               // (float) seconds
 
     super.run(remaining)
     
