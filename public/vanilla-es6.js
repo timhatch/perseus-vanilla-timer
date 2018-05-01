@@ -135,7 +135,7 @@ class CountdownTimer extends TimerView {
     this.clock           = this.run.bind(this)
     this.clock(hiResTime)
     // Handle es messages
-    var es = new EventSource('/timers/reset')
+    const es = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
   }
 
@@ -147,9 +147,9 @@ class CountdownTimer extends TimerView {
   
   // Commanded countdown timer
   run(timestamp) {
-    var now       = this.model.startTime + timestamp  // (float) milliseconds
-    var diff      = (this.model.end - now) / 1000     // (float) seconds
-    var remaining = diff > 0 ? diff : 0 
+    const now       = this.model.startTime + timestamp  // (float) milliseconds
+    const diff      = (this.model.end - now) / 1000     // (float) seconds
+    const remaining = diff > 0 ? diff : 0 
 
     super.run(remaining)
     
