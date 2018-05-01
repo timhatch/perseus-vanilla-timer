@@ -36,7 +36,7 @@ class AudioSignal {
     amplifier.gain.value = 0
     amplifier.connect(this.audioCTX.destination)
 
-    oscillator.type = "square"
+    oscillator.type            = "square"
     oscillator.frequency.value = f
     oscillator.connect(amplifier)
     oscillator.start()
@@ -63,7 +63,7 @@ class TimerView {
     // Instantiate the timer model
     const time      = options.seconds || 300  // (int) seconds
     const hiResTime = performance.now()       // (float) milliseconds
-    this.model      = { rotation: time, remaining: time, startTime: Date.now() - hiResTime }
+    this.model      = { rotation: time, remaining: time, start: Date.now() - hiResTime }
 
     // Set the font and line heights
     const viewportHeight     = document.documentElement.clientHeight
@@ -108,7 +108,7 @@ class TimerView {
 }
 
 class RotationTimer extends TimerView {
-  
+  // Constructor
   constructor(options) {
     super(options)
     // run the clock
@@ -118,7 +118,7 @@ class RotationTimer extends TimerView {
   
   // Rotation countdown timer
   run(timestamp) {
-    const now       = (this.model.startTime + timestamp) / 1000         // (float) seconds
+    const now       = (this.model.start + timestamp) / 1000             // (float) seconds
     const remaining = this.model.rotation - (now % this.model.rotation) // (float) seconds
 
     super.run(remaining)
@@ -128,7 +128,7 @@ class RotationTimer extends TimerView {
 }
 
 class CountdownTimer extends TimerView {
-  
+  // Constructor
   constructor(options) {
     super(options)
     // run the clock
@@ -141,13 +141,13 @@ class CountdownTimer extends TimerView {
 
   // React to any Server Sent Event message fired by the server
   handleESMessage(eventsource) {
-    const now      = parseFloat(eventsource.data)     // (float) milliseconds
+    const now      = parseFloat(eventsource.data)       // (float) milliseconds
     this.model.end = now + ((this.model.end - now) > 0 ? 0 : (this.model.rotation * 1000) + 899)
   }
   
   // Commanded countdown timer
   run(timestamp) {
-    const now       = this.model.startTime + timestamp  // (float) milliseconds
+    const now       = this.model.start + timestamp      // (float) milliseconds
     const diff      = (this.model.end - now) / 1000     // (float) seconds
     const remaining = diff > 0 ? diff : 0               // (float) seconds
 
