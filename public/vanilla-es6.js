@@ -19,10 +19,12 @@
 // - does not support es6 in the browser, so transpilation of this code is required
 // - does not support toLocaleString
 
+const AudioCTX  = window.AudioContext || window.webkitAudioContext
+
 class AudioSignal {
   // Create an audio object with a play method and two playable tones
-  constructor(audioContext, f) {
-    this.audioCTX = new audioContext()
+  constructor(f) {
+    this.audioCTX = new AudioCTX()
     this.tone     = this.createAudio(f)   
   }
 
@@ -55,10 +57,7 @@ class TimerView {
   
   constructor(options) {
     // If webAudio is supported, create the required audio signals
-    const audioContext = window.AudioContext || window.webkitAudioContext
-    this.audio    = []
-    this.audio[0] = audioContext ? new AudioSignal(audioContext, 425) : null 
-    this.audio[1] = audioContext ? new AudioSignal(audioContext, 600) : null 
+    this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
     
     // Instantiate the timer model
     const time      = options.seconds || 300  // (int) seconds
@@ -81,7 +80,7 @@ class TimerView {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
       this.updateClock()
-      this.audio[0] && this.playSound()
+      this.audio && this.playSound()
     }
   }
 
