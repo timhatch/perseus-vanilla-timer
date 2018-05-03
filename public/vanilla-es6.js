@@ -59,10 +59,11 @@ class TimerView {
     // If webAudio is supported, create the required audio signals
     this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
     
-    // Instantiate the timer model
-    const time      = options.seconds || 300  // (int) seconds
-    const hiResTime = performance.now()       // (float) milliseconds
-    this.model      = { rotation: time, remaining: time, start: Date.now() - hiResTime }
+    // Instantiate the timer model. Use software correction if ServerDate is loaded
+    const time      = options.seconds || 300            // (int) seconds
+    const now       = (window.ServerDate || Date).now() // (int) milliseconds
+    const hiResTime = performance.now()                 // (float) milliseconds
+    this.model      = { rotation: time, remaining: time, start: now - hiResTime }
 
     // Set the font and line heights
     const viewportHeight     = document.documentElement.clientHeight
