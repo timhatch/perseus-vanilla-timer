@@ -19,8 +19,12 @@
 // - does not support es6 in the browser, so transpilation of this code is required
 // - does not support toLocaleString
 
+// Will return null if the browser does not support the WebAudio API
 const AudioCTX  = window.AudioContext || window.webkitAudioContext
 
+// Class::AudioSignal
+// Generates and plays square wave tones for a given frequency and duration
+//
 class AudioSignal {
   // Create an audio object with a play method and two playable tones
   constructor(f) {
@@ -53,19 +57,23 @@ class AudioSignal {
   }
 }
 
+// Class::TimerView
+// A generic timer class 
 class TimerView {
   
   constructor(options) {
-    // If webAudio is supported, create the required audio signals
+    // If the WebAudio API is supported, create the required audio signals
     this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
-    
-    // Instantiate the timer model. Use software correction if ServerDate is loaded
-    const time      = options.seconds || 300            // (int) seconds
-    const now       = (window.ServerDate || Date).now() // (int) milliseconds
-    const hiResTime = performance.now()                 // (float) milliseconds
-    this.model      = { rotation: time, remaining: time, start: now - hiResTime }
 
-    // Set the font and line heights
+    // Instantiate the timer model.
+    // Use the ServerDate library to synchronise time if it has been included
+    const c = options.climbing   || 300         // (int) seconds
+    const p = options.interval   || 15          // (int) seconds
+    const n = (window.ServerDate || Date).now() // (int) milliseconds
+    const h = performance.now()                 // (float) milliseconds
+    this.model      = {rotation: c + p, remaining: c + p, preparation: p, start: n - h}
+
+    // Scale the displayed text to the screen dimensions
     const viewportHeight     = document.documentElement.clientHeight
     this.el                  = document.getElementById('inner')
     this.el.style.lineHeight = (1.0 * viewportHeight)+'px'
@@ -85,27 +93,40 @@ class TimerView {
     }
   }
 
-  // Play audio signals
+  // Play audio signals (650ms for the rotation start/end and one minute warning, 325ms for the five
+  // second countdown
   playSound() {
-    const t = Math.floor(this.model.remaining)  // (int) seconds
-    if (t === 0 || t === 60 || t === this.model.rotation) this.audio[1].play(666)
-    if (t < 6 && t > 0) this.audio[0].play(333)
+    const t = this.remainingTime()
+    if (t === 0 || t === 60 || t === this.model.rotation) this.audio[1].play(650)
+    if (t < 6 && t > 0) this.audio[0].play(325)
   }
 
   // Update the time display & play any relevant audible signal
   // this implementation assume that upDateClock is called only where time remaining
   // *in seconds* changes
   updateClock() {
-    const t = Math.floor(this.model.remaining)  // (int) seconds
-    const m = Math.floor(t / 60)                // (int) minutes
+    const t = this.remainingTime()
+    const m = Math.floor(t / 60)  // (int) minutes
     let   s = t % 60
 
+    // NOTE: Some browsers don't yet support toLocaleString, to format manually
     if (s < 10) s = '0' + s
     this.el.textContent = m + ':' + s
     //this.el.textContent = m + ':' + s.toLocaleString('en-US', { minimumIntegerDigits: 2 })
   }
+
+  // Utility method to return the remaining time in the current period
+  remainingTime() {
+    const t = this.model.remaining > this.model.preparation
+                ? this.model.remaining - this.model.preparation 
+                : this.model.remaining
+    return Math.floor(t)
+  }
 }
 
+// Class::TimerView::RotationTimer
+// Sub-class timerview to run a simple rotating timer. Use requestAnimationFrame to run as close
+// as possible to the screen refresh rate
 class RotationTimer extends TimerView {
   // Constructor
   constructor(options) {
