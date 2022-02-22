@@ -79,7 +79,7 @@ class TimerView {
     // Instantiate the timer model.
     // Use the ServerDate library to synchronise time if it has been included
     const c = options.climbing   || 300         // (int) seconds
-    const p = options.interval   || 15          // (int) seconds
+    const p = options.interval   || 0           // (int) seconds
     const n = (window.ServerDate || Date).now() // (int) milliseconds
     const h = performance.now()                 // (float) milliseconds
     this.model = {rotation: c + p, remaining: c + p, climbing: c, preparation: p, start: n - h}
