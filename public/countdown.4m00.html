@@ -11,7 +11,7 @@
   <script>
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
-      var clock = new CountdownTimer({climbing: 240, interval: 0})
+      const clock = new CountdownTimer({climbing: 240, interval: 0})
       document.getElementById('inner').addEventListener('click', clock.reset)
     }, false)
   </script>
