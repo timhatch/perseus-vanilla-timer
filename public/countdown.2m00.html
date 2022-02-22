@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <head>
   <meta charset='utf-8'>
-  <title>Master Timer</title>
+  <title>2m00 Countdown Timer</title>
   <link href='./content.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
   <div id='inner'></div>
+  <script src='./ServerDate.min.js'></script>
   <script src='./vanilla-es6.js'></script>
   <script>
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
-      var clock = new CountdownTimer({climbing: 240, interval: 0})
+      var clock = new CountdownTimer({climbing: 120, interval: 0})
       // Use a 'keydown' event to work with remotes that simulate keypresses
       // Use a 'click' or 'dblclick' event to work with mouse input 
       // Send a the current time to synchronise clock starts/ends based on the click event
       document.getElementById('inner').addEventListener('click', function(){
-        clock.handleESMessage({data: Date.now()})
+        // Invoke handleMessage without any POST to the server (offline testing)
+        // clock.handleESMessage({data: Date.now()})
+        // POST a message to the serrver (online use)
+        var data   = (window.ServerDate || Date).now()
+        var client = new XMLHttpRequest();
+        client.open("POST", '/timers/reset', true)
+        client.setRequestHeader('Content-Type', 'application/json')
+        client.send(data)
       })  
     }, false)
   </script>
