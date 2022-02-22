@@ -12,19 +12,7 @@
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
       var clock = new CountdownTimer({climbing: 240, interval: 0})
-      // Use a 'keydown' event to work with remotes that simulate keypresses
-      // Use a 'click' or 'dblclick' event to work with mouse input 
-      // Send a the current time to synchronise clock starts/ends based on the click event
-      document.getElementById('inner').addEventListener('click', function(){
-        // Invoke handleMessage without any POST to the server (offline testing)
-        // clock.handleESMessage({data: Date.now()})
-        // POST a message to the serrver (online use)
-        var data   = (window.ServerDate || Date).now()
-        var client = new XMLHttpRequest();
-        client.open("POST", '/timers/reset', true)
-        client.setRequestHeader('Content-Type', 'application/json')
-        client.send(data)
-      })  
+      document.getElementById('inner').addEventListener('click', clock.reset)
     }, false)
   </script>
 </body>
