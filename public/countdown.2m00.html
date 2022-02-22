@@ -12,6 +12,8 @@
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
       const clock = new CountdownTimer({climbing: 120, interval: 0})
+      // Respond to 'keydown' and 'click' events
+      document.addEventListener('keydown', (e) => { if (e.code == 'Enter') clock.reset()})
       document.getElementById('inner').addEventListener('click', clock.reset)
     }, false)
   </script>
