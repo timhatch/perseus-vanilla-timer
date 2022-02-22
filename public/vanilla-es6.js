@@ -82,7 +82,7 @@ class TimerView {
     const p = options.interval   || 15          // (int) seconds
     const n = (window.ServerDate || Date).now() // (int) milliseconds
     const h = performance.now()                 // (float) milliseconds
-    this.model      = {rotation: c + p, remaining: c + p, preparation: p, start: n - h}
+    this.model = {rotation: c + p, remaining: c + p, climbing: c, preparation: p, start: n - h}
 
     // Scale the displayed text to the screen dimensions
     const viewportHeight     = document.documentElement.clientHeight
@@ -116,12 +116,11 @@ class TimerView {
   // this implementation assume that upDateClock is called only where time remaining
   // *in seconds* changes
   updateClock() {
-    const t = this.remainingTime()
+    const t = Math.floor(this.model.remaining) ? this.remainingTime() : this.model.climbing
 
     this.el.textContent = toString(t)
   }
 
-  // Utility method to return the remaining time in the current period
   remainingTime() {
     const t = this.model.remaining > this.model.preparation
                 ? this.model.remaining - this.model.preparation 
