@@ -127,6 +127,15 @@ class TimerView {
                 : this.model.remaining
     return Math.floor(t)
   }
+
+  // Send a message to reset the clock
+  reset() {
+    const data   = (window.ServerDate || Date).now()
+    const client = new XMLHttpRequest()
+    client.open("POST", '/timers/reset', true)
+    client.setRequestHeader('Content-Type', 'application/json')
+    client.send(data)
+  }
 }
 
 // Class::TimerView::RotationTimer
