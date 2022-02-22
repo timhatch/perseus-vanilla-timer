@@ -6,20 +6,12 @@
 </head>
 <body>
   <div id='inner'></div>
-  <script src='./lib/ServerDate.js'></script>
-  <script src='./lib/underscore-1.8.3.min.js'></script>
-  <script src='./lib/backbone-1.3.3.min.js'></script>
-  <script src='./lib/backbone-nativeview-0.3.3.min.js'></script>
-  <script src='./timer.js'></script>
-  <script src='./timerview.js'></script>
+  <script src='./ServerDate.min.js'></script>
+  <script src='./vanilla-es6.js'></script>
   <script>
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
-      var clock = new App.TimerView({ 
-        'duration': 300, 
-        'el'      : document.getElementById('inner'), 
-        'type'    : 'rotationTimer' 
-      })
+      var clock = new RotationTimer({climbing: 40, interval: 15})
     }, false)
   </script>
 </body>
