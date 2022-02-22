@@ -57,6 +57,17 @@ class AudioSignal {
   }
 }
 
+// Utility method to return the remaining time in the current period
+const toString = (time) => {
+    const m = Math.floor(time / 60)
+    let   s = time % 60
+
+    // return (m + ':' + s.toLocaleString('en-US', { minimumIntegerDigits: 2 }))
+    // NOTE: Some browsers don't yet support toLocaleString, to format manually
+    if (s < 10) s = '0' + s
+    return `${m}:${s}`
+}
+
 // Class::TimerView
 // A generic timer class 
 class TimerView {
@@ -106,13 +117,8 @@ class TimerView {
   // *in seconds* changes
   updateClock() {
     const t = this.remainingTime()
-    const m = Math.floor(t / 60)  // (int) minutes
-    let   s = t % 60
 
-    // NOTE: Some browsers don't yet support toLocaleString, to format manually
-    if (s < 10) s = '0' + s
-    this.el.textContent = m + ':' + s
-    //this.el.textContent = m + ':' + s.toLocaleString('en-US', { minimumIntegerDigits: 2 })
+    this.el.textContent = toString(t)
   }
 
   // Utility method to return the remaining time in the current period
