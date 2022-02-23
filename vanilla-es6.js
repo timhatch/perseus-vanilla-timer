@@ -1,6 +1,6 @@
-//  A javascript timer for WC-format bouldering competitions.
+//  A javascript timer for WC-format competitions.
 //  Uses WebAudio to generate a standardised audio signals without latency effects
-//  Copyright 2012-18  T J Hatch
+//  Copyright 2012-22  T J Hatch
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -15,9 +15,13 @@
 //  limitations under the License.
 
 // NOTE
-// epiphany browser (3.8.2) as used in raspbian stretch:
-// - does not support es6 in the browser, so transpilation of this code is required
-// - does not support toLocaleString
+// Older browsers may not support es6 in which case this code will need to be transpiled to es5
+// Support for `toLocaleString` is not required/assumed
+
+/*
+* AUDIO SYNTHESIS
+* Use HTML5 Web Audio to generate required audio signals
+*/
 
 // Will return null if the browser does not support the WebAudio API
 const AudioCTX  = window.AudioContext || window.webkitAudioContext
@@ -67,6 +71,11 @@ const toString = (time) => {
     if (s < 10) s = '0' + s
     return `${m}:${s}`
 }
+
+/*
+* BASE TIMER IMPLEMENTATION
+* Define methods common to all timer types
+*/
 
 // Class::TimerView
 // A generic timer class 
@@ -138,6 +147,11 @@ class TimerView {
   }
 }
 
+/*
+* ROTATION TIMER IMPLEMENTATION
+* Implement a rolling countdown timer
+*/
+
 // Class::TimerView::RotationTimer
 // Sub-class timerview to run a simple rotating timer. Use requestAnimationFrame to run as close
 // as possible to the screen refresh rate
@@ -161,13 +175,21 @@ class RotationTimer extends TimerView {
   }
 }
 
+/*
+* COUNTDOWN TIMER IMPLEMENTATION
+* Implement a user-controlled countdown timer
+*/
+
 class CountdownTimer extends TimerView {
   // Constructor
   constructor(options) {
+    // Instantiate the timer
     super(options)
-    // run the clock
+    
+    // Bind and run the clock
     this.clock = this.run.bind(this)
     this.clock(null)
+    
     // Handle es messages
     const es     = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
@@ -179,7 +201,7 @@ class CountdownTimer extends TimerView {
     this.model.end = now + ((this.model.end - now) > 0 ? 0 : (this.model.rotation * 1000) + 899)
   }
   
-  // Commanded countdown timer
+  // Override the `run` method from the base TimerView class, looping using requestAnimationFrame
   run(timestamp) {
     const now       = this.model.start + timestamp      // (float) milliseconds
     const diff      = (this.model.end - now) / 1000     // (float) seconds
