@@ -105,7 +105,7 @@ class TimerView {
   run(timestamp) {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
-      this.updateClock()
+      this.setDisplayedTime()
       this.audio && this.playSound()
     }
   }
@@ -121,7 +121,7 @@ class TimerView {
   // Update the time display & play any relevant audible signal
   // this implementation assume that upDateClock is called only where time remaining
   // *in seconds* changes
-  updateClock() {
+  setDisplayedTime() {
     const t = Math.floor(this.model.remaining) ? this.remainingTime() : this.model.climbing
 
     this.el.textContent = toString(t)
