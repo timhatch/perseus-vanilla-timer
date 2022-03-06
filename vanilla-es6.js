@@ -82,7 +82,13 @@ class TimerView {
     const p = options.interval   || 0           // (int) seconds
     const n = (window.ServerDate || Date).now() // (int) milliseconds
     const h = performance.now()                 // (float) milliseconds
-    this.model = {rotation: c + p, remaining: c + p, climbing: c, preparation: p, start: n - h}
+    this.model = {
+      rotation: c + p,    // The full Rotation Period (s)
+      remaining: c + p,   // The initial time remaining in the rotation period
+      climbing: c,        // The Climbing Period (s)
+      preparation: p,     // The Transition/Preparation Period (s)
+      start: n - h        // The time at which we start the lock (last whole ms)
+    }
 
     // Scale the displayed text to the screen dimensions
     const viewportHeight     = document.documentElement.clientHeight
