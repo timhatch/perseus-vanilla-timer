@@ -97,11 +97,13 @@ class TimerView {
     this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
   }
   
-  // Given a time in seconds, compare it with the stored time remaining on the clock and if
-  // the two are different (a) update the displayed time and (b) if audio is supported play any
-  // relevant audio signal
-  // The point here is to allow the clock to iterate multiple times per second, but only refresh
-  // the display when the number of seconds remaining changes
+  // Given a fractional time in seconds, compare it with the stored time remaining on the clock and if
+  // the two are different:
+  // (a) update the displayed time and 
+  // (b) if audio is supported play any relevant audio signal
+  // 
+  // The point of using Math.floor() here is that `run` can be called multiple times every second,
+  // but the display will be repainted only once every second. This minimises CPU load.
   run(timestamp) {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
