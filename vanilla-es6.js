@@ -78,6 +78,9 @@ const toString = (time) => {
 * Define methods common to all timer types
 */
 
+// Use ServerDate to moderate times if available
+const TimeCTX = window.ServerDate || Date
+
 // Class::TimerView
 // A generic timer class 
 class TimerView {
@@ -87,10 +90,9 @@ class TimerView {
     this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
 
     // Instantiate the timer model.
-    // Use the ServerDate library to synchronise time if it has been included
     const c = options.climbing   || 300         // (int) seconds
     const p = options.interval   || 0           // (int) seconds
-    const n = (window.ServerDate || Date).now() // (int) milliseconds
+    const n = TimeCTX.now()                     // (int) milliseconds
     const h = performance.now()                 // (float) milliseconds
     this.model = {
       rotation: c + p,    // The full Rotation Period (s)
@@ -180,7 +182,7 @@ class TimerView {
   //
   // sig: () -> void
   reset() {
-    const data   = (window.ServerDate || Date).now()
+    const data   = TimeCTX.now()
     const client = new XMLHttpRequest()
     client.open("POST", '/timers/reset', true)
     client.setRequestHeader('Content-Type', 'application/json')
