@@ -256,8 +256,8 @@ class CountdownTimer extends TimerView {
 
     super.run(remaining)
     
-    // Use requestAnimationFrame() in preference to setTimeout()
-    // TODO: Add commentary on rationale for using requestAnimationFrame 
+    // Use requestAnimationFrame() in preference to setTimeout(). requestAnimationFrame notionally runs locked
+    // to the screen refresh rate. Running faster than this is unnecessary.
     requestAnimationFrame(this.clock)
   }
 }
