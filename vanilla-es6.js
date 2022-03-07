@@ -14,6 +14,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+/*
+* AUDIO SIGNAL IMPLEMENTATION
+* Use the Web Audio API to synthesise sounds
+*/
 
 // Will return null if the browser does not support the WebAudio API
 const AudioCTX  = window.AudioContext || window.webkitAudioContext
