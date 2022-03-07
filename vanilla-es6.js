@@ -14,10 +14,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-// NOTE
-// epiphany browser (3.8.2) as used in raspbian stretch:
-// - does not support es6 in the browser, so transpilation of this code is required
-// - does not support toLocaleString
 
 // Will return null if the browser does not support the WebAudio API
 const AudioCTX  = window.AudioContext || window.webkitAudioContext
@@ -49,15 +45,20 @@ class AudioSignal {
     return amplifier 
   }
 
-  // "Play" a specified signal by adjusting the amplifier gain
+  // Play a specified signal by adjusting the amplifier gain
   // @duration  - the duration of the signal
+  //
+  // sig: (Integer duration) -> void
   play(duration) {
     this.tone.gain.setValueAtTime(1, this.audioCTX.currentTime)
     this.tone.gain.setValueAtTime(0, this.audioCTX.currentTime + duration/1000)
   }
 }
 
-// Utility method to return the remaining time in the current period
+// Utility method to return the remaining time in the current period as a string
+// formatted as `m:ss`
+//
+// sig: (Double time) -> (String)
 const toString = (time) => {
     const m = Math.floor(time / 60)
     let   s = time % 60
@@ -86,7 +87,7 @@ class TimerView {
       rotation: c + p,    // The full Rotation Period (s)
       remaining: c + p,   // The initial time remaining in the rotation period
       climbing: c,        // The Climbing Period (s)
-      preparation: p,     // The Transition/Preparation Period (s)
+      preparation: p,     // The Transition/Preparation Period (s) FOLLOWING the Climbing Period
       start: n - h        // The time at which we start the lock (last whole ms)
     }
 
@@ -104,6 +105,8 @@ class TimerView {
   // 
   // The point of using Math.floor() here is that `run` can be called multiple times every second,
   // but the display will be repainted only once every second. This minimises CPU load.
+  //
+  // sig: (Double timestamp) -> void
   run(timestamp) {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
@@ -114,29 +117,59 @@ class TimerView {
 
   // Play audio signals (650ms for the rotation start/end and one minute warning, 325ms for the five
   // second countdown
+  //
+  // sig: () -> void
   playSound() {
     const t = this.remainingTime()
+    // PLay tone #2 when the countdown starts/ends and when 1 minute remains
     if (t === 0 || t === 60 || t === this.model.rotation) this.audio[1].play(650)
+    // Play tone #1 as a 5 second countdown (5/4/2/3/1)
     if (t < 6 && t > 0) this.audio[0].play(325)
   }
 
-  // Update the time display & play any relevant audible signal
-  // this implementation assume that upDateClock is called only where time remaining
-  // *in seconds* changes
+  // Set (update) the time displayed on the screen
+  //
+  // If the remaining time in the Rotation Period > 0, display the time remaining in the
+  // current period (i.e. the time remaining in either the Climbing Period or the
+  // Preparation/Transition Period. 
+  // If the remaining time in the Attepmt/Rotation period is 0, display the Climbing Period.
+  // This gives a display sequence at the end of the climbing period as follows:
+  // 0:03
+  // 0:02
+  // 0:01
+  // 4:00
+  // 3:59
+  //
+  // sig () -> void
   setDisplayedTime() {
     const t = Math.floor(this.model.remaining) ? this.remainingTime() : this.model.climbing
 
     this.el.textContent = toString(t)
   }
 
+  // Calculate the time left in the current period, i.e. either
+  // (a) the time remaining in the Climbing Period; or
+  // (b) the time remaining in the Preparation/Transition Period
+  // 
+  // The assumption here is that if the remaining time is greater than the duration of the
+  // Preparation/Transition Period, then we must be in the Climbing Period. In which case we
+  // display `remaining - preparation` (rounded down to the nearest second)
+  // Conversely, if the remaining time is less than or equal to the preparation period, we
+  // must be in the Preparation/Tranistion Period following the Climbing Period, in which
+  // case we simply return the remaining time in seconds
+  //
+  // sig () -> (Integer)
   remainingTime() {
     const t = this.model.remaining > this.model.preparation
-                ? this.model.remaining - this.model.preparation 
+                ? this.model.remaining - this.model.preparation
                 : this.model.remaining
+
     return Math.floor(t)
   }
 
   // Send a message to reset the clock
+  //
+  // sig: () -> void
   reset() {
     const data   = (window.ServerDate || Date).now()
     const client = new XMLHttpRequest()
@@ -171,11 +204,16 @@ class RotationTimer extends TimerView {
 
 class CountdownTimer extends TimerView {
   // Constructor
+  // NOTE: The required properties for the`options` Hash are defined in the TimerView superclass
+  //
+  // sig: (Hash options) -> void
   constructor(options) {
     super(options)
-    // run the clock
+
+    // bind the run method and run the clock
     this.clock = this.run.bind(this)
     this.clock(null)
+
     // Handle es messages
     const es     = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
@@ -184,6 +222,7 @@ class CountdownTimer extends TimerView {
   // React to any Server Sent Event message fired by the server
   handleESMessage(eventsource) {
     const now      = parseFloat(eventsource.data)       // (float) milliseconds
+    //  
     this.model.end = now + ((this.model.end - now) > 0 ? 0 : (this.model.rotation * 1000) + 899)
   }
   
@@ -195,6 +234,8 @@ class CountdownTimer extends TimerView {
 
     super.run(remaining)
     
+    // Use requestAnimationFrame() in preference to setTimeout()
+    // TODO: Add commentary on rationale for using requestAnimationFrame 
     requestAnimationFrame(this.clock)
   }
 }
