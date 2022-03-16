@@ -5,6 +5,7 @@
   <link href='./content.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
+  <div id='cntrl'>4m15 rotation</div>
   <div id='inner'></div>
   <script src='./ServerDate.min.js'></script>
   <script src='./vanilla-es6.js'></script>
@@ -12,6 +13,7 @@
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
       var clock = new RotationTimer({climbing: 240, interval: 15})
+      document.getElementById('cntrl').addEventListener('click', clock.requestFullscreen)
     }, false)
   </script>
 </body>

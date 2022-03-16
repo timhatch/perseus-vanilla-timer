@@ -5,6 +5,7 @@
   <link href='./content.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
+  <div id='cntrl'>4m00 countdown</div>
   <div id='inner'></div>
   <script src='./ServerDate.min.js'></script>
   <script src='./vanilla-es6.js'></script>
@@ -15,6 +16,7 @@
       // Respond to 'keydown' and 'click' events
       document.addEventListener('keydown', (e) => { if (e.code == 'Enter') clock.reset()})
       document.getElementById('inner').addEventListener('click', clock.reset)
+      document.getElementById('cntrl').addEventListener('click', clock.requestFullscreen)
     }, false)
   </script>
 </body>
