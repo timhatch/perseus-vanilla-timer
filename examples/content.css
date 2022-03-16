@@ -16,12 +16,19 @@ html, body {
   width       : 100%;
 
   background-color: #000;
-  cursor      : none;
 }
+
 #inner {
   font-family : Arial, sans-serif;
   color       : white;
   text-align  : center;
+  cursor      : none;
+}
+
+#cntrl {
+  font-family : Arial, sans-serif;
+  color       : #444444;
+  height      : 24px;
 }
 
 /* Media query for CWIF livestream
