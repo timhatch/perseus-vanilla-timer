@@ -96,7 +96,7 @@ class TimerView {
     // Scale the displayed text to the screen dimensions
     const viewportHeight     = document.documentElement.clientHeight
     this.el                  = document.getElementById('inner')
-    this.el.style.lineHeight = (1.0 * viewportHeight)+'px'
+    this.el.style.lineHeight = (viewportHeight - 24)+'px'
     this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
   }
 
