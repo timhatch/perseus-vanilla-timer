@@ -99,7 +99,18 @@ class TimerView {
     this.el.style.lineHeight = (1.0 * viewportHeight)+'px'
     this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
   }
-  
+
+  // Use the requestFullscreen API if available
+  // sig: () -> void
+  requestFullscreen() {
+    const page = document.documentElement
+    if (page.requestFullscreen) {
+      page.requestFullscreen()
+    } else if (page.webkitRequestFullscreen) {
+      page.webkitRequestFullscreen()
+    }
+  }
+
   // Given a time in seconds, compare it with the stored time remaining on the clock and if
   // the two are different (a) update the displayed time and (b) if audio is supported play any
   // relevant audio signal
@@ -212,3 +223,4 @@ class CountdownTimer extends TimerView {
     requestAnimationFrame(this.clock)
   }
 }
+
