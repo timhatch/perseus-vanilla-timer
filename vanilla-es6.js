@@ -72,6 +72,9 @@ const toString = (time) => {
     return `${m}:${s}`
 }
 
+// Use ServerDate to moderate times if available
+const TimeCTX = window.ServerDate || Date
+
 /*
 * BASE TIMER IMPLEMENTATION
 * Define methods common to all timer types
@@ -89,7 +92,7 @@ class TimerView {
     // Use the ServerDate library to synchronise time if it has been included
     const c = options.climbing   || 300         // (int) seconds
     const p = options.interval   || 0           // (int) seconds
-    const n = (window.ServerDate || Date).now() // (int) milliseconds
+    const n = TimeCTX.now() // (int) milliseconds
     const h = performance.now()                 // (float) milliseconds
     this.model = {rotation: c + p, remaining: c + p, climbing: c, preparation: p, start: n - h}
 
@@ -149,7 +152,7 @@ class TimerView {
 
   // Send a message to reset the clock
   reset() {
-    const data   = (window.ServerDate || Date).now()
+    const data   = TimeCTX.now()
     const client = new XMLHttpRequest()
     client.open("POST", '/timers/reset', true)
     client.setRequestHeader('Content-Type', 'application/json')
@@ -180,7 +183,9 @@ class RotationTimer extends TimerView {
     const remaining = this.model.rotation - (now % this.model.rotation) // (float) seconds
 
     super.run(remaining)
-    
+
+    // Use requestAnimationFrame() in preference to setTimeout(). requestAnimationFrame notionally runs locked
+    // to the screen refresh rate. Running faster than this is unnecessary.
     requestAnimationFrame(this.clock)
   }
 }
