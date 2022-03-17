@@ -5,15 +5,39 @@
   <link href='./content.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
-  <div id='cntrl'>4m15 rotation</div>
-  <div id='inner'></div>
-  <script src='./ServerDate.min.js'></script>
+  <div class="flex container">
+    <div class="flex row">
+      <div id='4m15' class="button">4m15 rotation</div>
+      <div id='5m00' class="button">5m00 rotation</div>
+      <div id='5m15' class="button">5m15 rotation</div>
+    </div>
+    <div class="flex timer" id='inner'></div>
+  </div>
   <script src='./vanilla-es6.js'></script>
   <script>
+    var clock = null
+    function init(el, climbing, interval) {
+      if (!clock) {
+        document.getElementById(el).style.color = '#ff000066'
+        clock = new RotationTimer({climbing, interval})
+      }
+    }
+
+    function load(event, climbing, interval) {
+      expand().then(() => setTimeout(() => init(event.target.id, climbing, interval), 33))
+    }
+
+    async function expand() {
+      const page = document.documentElement
+      if (page.requestFullscreen)       return page.requestFullscreen()
+      if (page.webkitRequestFullscreen) return page.webkitRequestFullscreen()
+    }
+
     // Launch the timer when the DOM is loaded
     document.addEventListener('DOMContentLoaded', function(){
-      var clock = new RotationTimer({climbing: 240, interval: 15})
-      document.getElementById('cntrl').addEventListener('click', clock.requestFullscreen)
+      document.getElementById('4m15').addEventListener('click', (e) => load(e, 240,15))
+      document.getElementById('5m00').addEventListener('click', (e) => load(e, 300,0))
+      document.getElementById('5m15').addEventListener('click', (e) => load(e, 300,15))
     }, false)
   </script>
 </body>
