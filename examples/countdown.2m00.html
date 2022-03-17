@@ -1,22 +1,63 @@
 <!DOCTYPE html>
 <head>
   <meta charset='utf-8'>
-  <title>2m00 Countdown Timer</title>
+  <title>Countdown Timers</title>
   <link href='./content.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
-  <div id='cntrl'>2m00 countdown</div>
-  <div id='inner'></div>
+  <div class="flex container">
+    <div class="flex row">
+      <div id='2m00' class="button">2m00 countdown</div>
+      <div id='4m00' class="button">4m00 countdown</div>
+      <div id='6m00' class="button">6m00 countdown</div>
+    </div>
+    <div class="flex timer" id='inner'></div>
+  </div>
   <script src='./ServerDate.min.js'></script>
   <script src='./vanilla-es6.js'></script>
   <script>
-    // Launch the timer when the DOM is loaded
+    var clock = null
+
+    // Initialise the clock only where it doesn't already exist 
+    // and indicate the selection
+    // sig: (HTMLElement el, Integer climbing, Integer interval) -> void
+    function init(el, climbing, interval) {
+      if (!clock) {
+        document.getElementById(el).style.color = '#ff000066'
+        clock = new CountdownTimer({climbing, interval})
+      }
+    }
+
+    // Handle click events
+    // - Request fullscreen display
+    // - If successful, initialize the clock
+    // - Otherwise catch the error
+    // sig: (Event event, Integer climbing, Integer interval) -> void
+    function handler(event, climbing, interval) {
+      fullscreen().then(() => setTimeout(() => init(event.target.id, climbing, interval), 33))
+                  .catch((e) => console.log(e))
+    }
+
+    // Use the requestFullscreen API
+    // sig: () -> (Promise)
+    async function fullscreen() {
+      const page = document.documentElement
+      if (page.requestFullscreen)       return page.requestFullscreen()
+      if (page.webkitRequestFullscreen) return page.webkitRequestFullscreen()
+    }
+
+    // Call the clock's reset() method
+    // sig: () -> void
+    const reset = () => clock.reset()
+
+    // The main event loop
     document.addEventListener('DOMContentLoaded', function(){
-      const clock = new CountdownTimer({climbing: 120, interval: 0})
+      document.getElementById('2m00').addEventListener('click', (e) => handler(e, 120,0))
+      document.getElementById('4m00').addEventListener('click', (e) => handler(e, 240,0))
+      document.getElementById('6m00').addEventListener('click', (e) => handler(e, 360,0))
       // Respond to 'keydown' and 'click' events
-      document.addEventListener('keydown', (e) => { if (e.code == 'Enter') clock.reset()})
-      document.getElementById('inner').addEventListener('click', clock.reset)
-      document.getElementById('cntrl').addEventListener('click', clock.requestFullscreen)
+      document.addEventListener('keydown', (e) => { if (e.code == 'Enter') reset()})
+      document.getElementById('inner').addEventListener('click', reset)
     }, false)
   </script>
 </body>
