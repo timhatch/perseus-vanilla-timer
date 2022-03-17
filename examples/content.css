@@ -18,6 +18,29 @@ html, body {
   background-color: #000;
 }
 
+.flex {
+  display:          flex;
+  flex-direction:   column;
+  align-items:      center;
+}
+
+.container {
+  justify-content:  flex-start;
+  height:           100vh;
+}
+
+.row {
+  flex-direction:   row;
+  justify-content:  center;
+}
+
+.timer {
+  flex-direction:   initial;
+  justify-self:     center;
+  height:           100%;
+}
+
+
 #inner {
   font-family : Arial, sans-serif;
   color       : white;
@@ -25,20 +48,14 @@ html, body {
   cursor      : none;
 }
 
-#cntrl {
+#cntrl, .button {
   font-family : Arial, sans-serif;
-  color       : #444444;
-  height      : 24px;
-}
+  font-size   : 1.0rem;
+  line-height : 1.5rem;
+  text-align  : center;
 
-/* Media query for CWIF livestream
-@media (max-width: 768px) {
-  html, body {
-    background-color: #aed845;
-  }
-  
-  #inner {
-    font-family : AzoRegular, sans-serif;    
-  }
+  margin      : 0 1rem;
+  width       : 10rem;
+  color       : #444444;
+  background-color: #111111;
 }
-*/
