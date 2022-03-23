@@ -18,59 +18,6 @@
 // Older browsers may not support es6 in which case this code will need to be transpiled to es5
 // Support for `toLocaleString` is not required/assumed
 
-/*
-* AUDIO SYNTHESIS
-* Use HTML5 Web Audio to generate required audio signals
-*/
-
-// Will return null if the browser does not support the WebAudio API
-const AudioCTX  = window.AudioContext || window.webkitAudioContext
-
-// Class::AudioSignal
-// Generates and plays square wave tones for a given frequency and duration
-//
-class AudioSignal {
-  // Create an audio object with a play method and two playable tones
-  constructor(f) {
-    this.audioCTX = new AudioCTX()
-    this.tone     = this.createAudio(f)   
-  }
-
-  // Create an Audio Graph comprising a square wave oscillator and an amplifier
-  // @f - a frequency in Hz for the generated tone
-  createAudio(f) {
-    const oscillator = this.audioCTX.createOscillator()
-    const amplifier  = this.audioCTX.createGain()
-    
-    amplifier.gain.value = 0
-    amplifier.connect(this.audioCTX.destination)
-
-    oscillator.type            = "square"
-    oscillator.frequency.value = f
-    oscillator.connect(amplifier)
-    oscillator.start()
-
-    return amplifier 
-  }
-
-  // "Play" a specified signal by adjusting the amplifier gain
-  // @duration  - the duration of the signal
-  play(duration) {
-    this.tone.gain.setValueAtTime(1, this.audioCTX.currentTime)
-    this.tone.gain.setValueAtTime(0, this.audioCTX.currentTime + duration/1000)
-  }
-}
-
-// Utility method to return the remaining time in the current period
-const toString = (time) => {
-    const m = Math.floor(time / 60)
-    let   s = time % 60
-
-    // return (m + ':' + s.toLocaleString('en-US', { minimumIntegerDigits: 2 }))
-    // NOTE: Some browsers don't yet support toLocaleString, to format manually
-    if (s < 10) s = '0' + s
-    return `${m}:${s}`
-}
 
 // Use ServerDate to moderate times if available
 const TimeCTX = window.ServerDate || Date
