@@ -100,17 +100,7 @@ class TimerView {
     const viewportHeight     = document.documentElement.clientHeight
     this.el                  = document.getElementById('inner')
     this.el.style.fontSize   = (0.7 * viewportHeight)+'px'
-  }
 
-  // Use the requestFullscreen API if available
-  // sig: () -> void
-  requestFullscreen() {
-    const page = document.documentElement
-    if (page.requestFullscreen) {
-      page.requestFullscreen()
-    } else if (page.webkitRequestFullscreen) {
-      page.webkitRequestFullscreen()
-    }
   }
 
   // Given a time in seconds, compare it with the stored time remaining on the clock and if
