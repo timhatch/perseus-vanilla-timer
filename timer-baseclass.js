@@ -11,9 +11,6 @@ const toString = (time) => {
     return `${m}:${s}`
 }
 
-// Use ServerDate to moderate times if available
-const TimeCTX = window.ServerDate || Date
-
 /*
 * BASE TIMER IMPLEMENTATION
 * Define methods common to all timer types
@@ -31,10 +28,9 @@ class TimerView {
     this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
 
     // Instantiate the timer model.
-    // Use the ServerDate library to synchronise time if it has been included
     const c = options.climbing   || 300         // (int) seconds
     const p = options.interval   || 0           // (int) seconds
-    const n = TimeCTX.now() // (int) milliseconds
+    const n = Date.now() // (int) milliseconds
     const h = performance.now()                 // (float) milliseconds
     this.model = {rotation: c + p, remaining: c + p, climbing: c, preparation: p, start: n - h}
 
@@ -93,7 +89,7 @@ class TimerView {
 
   // Send a message to reset the clock
   reset() {
-    const data   = TimeCTX.now()
+    const data   = Date.now()
     const client = new XMLHttpRequest()
     client.open("POST", '/timers/reset', true)
     client.setRequestHeader('Content-Type', 'application/json')
