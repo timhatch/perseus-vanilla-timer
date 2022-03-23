@@ -85,6 +85,9 @@ const TimeCTX = window.ServerDate || Date
 class TimerView {
   
   constructor(options) {
+    // Associate a websockt instance with the timer
+    this.socket = options.socket
+
     // If the WebAudio API is supported, create the required audio signals
     this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
 
@@ -111,6 +114,7 @@ class TimerView {
   run(timestamp) {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
+      this.pushTime()
       this.updateClock()
       this.audio && this.playSound()
     }
@@ -122,6 +126,14 @@ class TimerView {
     const t = this.remainingTime()
     if (t === 0 || t === 60 || t === this.model.rotation) this.audio[1].play(650)
     if (t < 6 && t > 0) this.audio[0].play(325)
+  }
+
+  // Broadcast time changes using websockets
+  // this implementation assumes that upDateClock is called only where time remaining
+  // *in seconds* changes
+  pushTime() {
+    const data = JSON.stringify(this.model)
+    this.socket.send(data)
   }
 
   // Update the time display & play any relevant audible signal
