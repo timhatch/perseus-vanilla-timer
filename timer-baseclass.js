@@ -21,19 +21,20 @@ const toString = (time) => {
 class TimerView {
   
   constructor(options) {
+    // Instantiate the timer model.
+    const start       = Date.now()                        // (int) milliseconds
+    const climbing    = options.climbing   || 300         // (int) seconds
+    const preparation = options.interval   || 0           // (int) seconds
+    const remaining   = climbing + preparation
+
+    // Model properties
+    this.model  = {climbing, preparation, start, remaining}
+
     // Associate a websockt instance with the timer
     this.socket = options.socket
 
     // If the WebAudio API is supported, create the required audio signals
     this.audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
-
-    // Instantiate the timer model.
-    const c = options.climbing   || 300         // (int) seconds
-    const p = options.interval   || 0           // (int) seconds
-    const n = Date.now() // (int) milliseconds
-    const h = performance.now()                 // (float) milliseconds
-    this.model = {rotation: c + p, remaining: c + p, climbing: c, preparation: p, start: n - h}
-
     // Scale the displayed text to the screen dimensions
     const viewportHeight     = document.documentElement.clientHeight
     this.el                  = document.getElementById('inner')
