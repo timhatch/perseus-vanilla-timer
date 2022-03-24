@@ -21,7 +21,6 @@
 
     // Create a global clock instance
     var clock  = null
-    var socket = new WebSocket(`ws://${window.location.hostname}/pub`)
     var sub    = new WebSocket(`ws://${window.location.hostname}/sub`)
     var el     = document.getElementById('inner')
 
@@ -32,7 +31,7 @@
       const el = event.target.id
       if (!clock) {
         document.getElementById(el).style.color = '#ff000066'
-        clock = new RotationTimer({socket, climbing, interval})
+        clock = new RotationTimer({climbing, interval})
       }
     }
 
