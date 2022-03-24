@@ -49,9 +49,9 @@ class TimerView {
   run(timestamp) {
     if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
       this.model.remaining = timestamp
-      this.pushTime()
       this.updateClock()
       this.audio && this.playSound()
+      this.broadcast()
     }
   }
 
@@ -66,7 +66,7 @@ class TimerView {
   // Broadcast time changes using websockets
   // this implementation assumes that upDateClock is called only where time remaining
   // *in seconds* changes
-  pushTime() {
+  broadcast() {
     const data = JSON.stringify(this.model)
     this.socket.send(data)
   }
