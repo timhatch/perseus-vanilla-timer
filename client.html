@@ -9,24 +9,13 @@
     <div class="flex timer" id='inner'></div>
   </div>
   <script type="module">
-    import {display, format, onResize} from "./timer-baseclass.js"
+    import {clockTime, display, format, onResize} from "./timer-views.js"
 
     const socket = new WebSocket(`ws://${window.location.hostname}/sub`)
     const el     = document.getElementById('inner')
 
-    // Update the displayed time on the occurence of a relevant socket event 
-    //
-    // sig: (MessageEvent event) -> void
-    function clockTime(event) {
-      const opts     = JSON.parse(event.data) // Parse the `data` string
-      const time     = display({...opts})     // Calculate/format the time to be displayed
-      el.textContent = format(time)           // Display the time
-      // CHECK VALUES
-      console.log(opts)
-    }
-
     // Main event loop
-    socket.onmessage = clockTime
+    socket.onmessage = clockTime(el)
     // Resize text when the window size changes
     // window.onresize = () => onResize(el)
   </script>

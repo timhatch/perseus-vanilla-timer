@@ -12,41 +12,31 @@
       <div id='5m15' class="button">5m15 rotation</div>
     </div>
     <div class="flex timer" id='inner'></div>
+    <div class="flex timer" id='outer'></div>
   </div>
   <script type="module">
-    import {onResize}    from "./timer-baseclass.js"
-    import RotationTimer from './timer-rotation.js'
+    import {clockTime, display, format,
+            fullscreen, onResize} from "./timer-views.js"
+    import RotationTimer          from './timer-rotation.js'
+
     // Create a global clock instance
     var clock  = null
     var socket = new WebSocket(`ws://${window.location.hostname}/pub`)
+    var sub    = new WebSocket(`ws://${window.location.hostname}/sub`)
+    var el     = document.getElementById('inner')
 
     // Initialise the clock only where it doesn't already exist 
     // and indicate the selection
     // sig: (HTMLElement el, Integer climbing, Integer interval) -> void
-    function init(el, climbing, interval) {
+    function handler(event, climbing, interval) {
+      const el = event.target.id
       if (!clock) {
         document.getElementById(el).style.color = '#ff000066'
         clock = new RotationTimer({socket, climbing, interval})
       }
     }
 
-    // Handle click events
-    // - Request fullscreen display
-    // - If successful, initialize the clock
-    // - Otherwise catch the error
-    // sig: (Event event, Integer climbing, Integer interval) -> void
-    function handler(event, climbing, interval) {
-      fullscreen().then(() => setTimeout(() => init(event.target.id, climbing, interval), 33))
-                  .catch((e) => console.log(e))
-    }
-
-    //  Use the requestFullscreen API
-    // sig: () -> (Promise)
-    async function fullscreen() {
-      const page = document.documentElement
-      if (page.requestFullscreen)       return page.requestFullscreen()
-      if (page.webkitRequestFullscreen) return page.webkitRequestFullscreen()
-    }
+    sub.onmessage = clockTime(el)
 
     // The main event loop
     document.addEventListener('DOMContentLoaded', function(){
