@@ -8,35 +8,11 @@
   <div class="flex container">
     <div class="flex timer" id='inner'></div>
   </div>
-  <script>
+  <script type="module">
+    import {display, format, onResize} from "./timer-baseclass.js"
+
     const socket = new WebSocket(`ws://${window.location.hostname}/sub`)
     const el     = document.getElementById('inner')
-
-    // Return the time to be displayed
-    // Assumes the following IFSC time periods are provided:
-    // climbing:    the allowed climbing period
-    // preparation: the allowed interval following a climbing period (e.g. in boulder, the transition time)
-    // remaining:   the calculated time  remaining within the rotation/attempt period
-    //
-    // sig: (Hash) -> Double
-    function display({remaining, climbing, preparation}) {
-      // If there's no time left in the rotation/attempt period, return the climbing time
-      if (!Math.floor(remaining)) return climbing
-
-      // Otherwise. calculate whether we're in the climbing or preparation period and return the
-      // remaining time within the relevant period
-      return remaining > preparation ? (remaining - preparation) : remaining
-    }
-
-    // Format the time into a mm:ss string
-    //
-    // sig: (Double time) -> String
-    function format(time) {
-      const m = Math.floor(time / 60)
-      const s = Math.floor(time % 60)
-
-      return (m + ':' + s.toLocaleString('en-US', {minimumIntegerDigits: 2}))
-    }
 
     // Update the displayed time on the occurence of a relevant socket event 
     //
@@ -46,13 +22,13 @@
       const time     = display({...opts})     // Calculate/format the time to be displayed
       el.textContent = format(time)           // Display the time
       // CHECK VALUES
-      // console.log(opts)
+      console.log(opts)
     }
 
     // Main event loop
     socket.onmessage = clockTime
     // Resize text when the window size changes
-    window.onresize = () => { el.style.fontSize = `${document.documentElement.clientHeight * 0.7}px` }
+    // window.onresize = () => onResize(el)
   </script>
 </body>
 
