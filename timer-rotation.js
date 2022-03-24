@@ -12,6 +12,10 @@ class RotationTimer extends TimerView {
   // Constructor
   constructor(options) {
     super(options)
+
+    // Define the rotation period
+    this.rotation = this.model.climbing + this.model.preparation
+
     // run the clock
     this.clock = this.run.bind(this)
     this.clock(null)
@@ -19,8 +23,8 @@ class RotationTimer extends TimerView {
   
   // Rotation countdown timer
   run(timestamp) {
-    const now       = (this.model.start + timestamp) / 1000             // (float) seconds
-    const remaining = this.model.rotation - (now % this.model.rotation) // (float) seconds
+    const now       = (this.model.start + timestamp) / 1000     // (float) seconds
+    const remaining = this.rotation - (now % this.rotation)     // (float) seconds
 
     super.run(remaining)
 
