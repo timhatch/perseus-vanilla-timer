@@ -14,6 +14,7 @@
     <div class="flex timer" id='inner'></div>
   </div>
   <script type="module">
+    import {onResize}    from "./timer-baseclass.js"
     import RotationTimer from './timer-rotation.js'
     // Create a global clock instance
     var clock  = null
@@ -42,9 +43,9 @@
     //  Use the requestFullscreen API
     // sig: () -> (Promise)
     async function fullscreen() {
-      // const page = document.documentElement
-      // if (page.requestFullscreen)       return page.requestFullscreen()
-      // if (page.webkitRequestFullscreen) return page.webkitRequestFullscreen()
+      const page = document.documentElement
+      if (page.requestFullscreen)       return page.requestFullscreen()
+      if (page.webkitRequestFullscreen) return page.webkitRequestFullscreen()
     }
 
     // The main event loop
