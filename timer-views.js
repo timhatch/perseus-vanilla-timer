@@ -25,18 +25,6 @@ export function display({remaining, climbing, preparation}) {
   return remaining > preparation ? (remaining - preparation) : remaining
 }
 
-// Fullscreen
-export async function fullscreen() {
-  const page = document.documentElement
-  if (page.requestFullscreen)       return page.requestFullscreen()
-  if (page.webkitRequestFullscreen) return page.webkitRequestFullscreen()
-}
-
-// Resize
-export function onResize(el) {
-  el.style.fontSize = `${document.documentElement.clientHeight * 0.7}px`
-}
-
 // Display time
 export function clockTime(el) {
   return (event) => {

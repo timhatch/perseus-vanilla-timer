@@ -15,8 +15,8 @@
     <div class="flex timer" id='outer'></div>
   </div>
   <script type="module">
-    import {clockTime, display, format,
-            fullscreen, onResize} from "./timer-views.js"
+    import {fullScreen, onResize} from "./display-utils.js"
+    import {clockTime}            from "./timer-views.js"
     import RotationTimer          from './timer-rotation.js'
 
     // Create a global clock instance
