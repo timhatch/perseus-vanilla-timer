@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+  <meta charset='utf-8'>
+  <title>Countdown Timers</title>
+  <link href='./content.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <div class="flex container">
+    <div class="flex row">
+      <div id='4m15' class="button">4m00 rotation</div>
+      <div id='5m00' class="button">4m00 rotation</div>
+      <div id='5m15' class="button">4m15 rotation</div>
+    </div>
+    <div class="flex timer" id='inner'></div>
+    <div class="flex timer" id='outer'></div>
+  </div>
+  <script type="module">
+    import {fullScreen, onResize} from "./display-utils.js"
+    import CountdownTimer         from './timer-countdown.js'
+
+    // Create a global clock instance
+    var clock  = null
+    var socket = new WebSocket(`ws://${window.location.hostname}/sub`)
+    var el     = document.getElementById('inner')
+
+    // Initialise the clock only where it doesn't already exist 
+    // and indicate the selection
+    // sig: (HTMLElement el, Integer climbing, Integer interval) -> void
+    function handler(event, climbing, interval) {
+      const el = event.target.id
+      if (!clock) {
+        document.getElementById(el).style.color = '#ff000066'
+        clock = new CountdownTimer({climbing, interval})
+      }
+    }
+
+    socket.onmessage = (event) => el.textContent = event.data
+
+    // The main event loop
+    document.addEventListener('DOMContentLoaded', function(){
+      document.getElementById('inner').addEventListener('click', () => clock.reset())
+      document.getElementById('4m15').addEventListener('click', (e) => handler(e, 120,0))
+      document.getElementById('5m00').addEventListener('click', (e) => handler(e, 240,0))
+      document.getElementById('5m15').addEventListener('click', (e) => handler(e, 90,15))
+    }, false)
+  </script>
+</body>
+
+
