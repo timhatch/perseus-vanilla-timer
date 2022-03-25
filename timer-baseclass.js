@@ -2,6 +2,8 @@ import AudioSignal, {AudioCTX} from "./audiosignal.js"
 
 import {format, display}       from "./timer-views.js"
 
+const compose = (...fns) => (initialVal) => fns.reduceRight((val, fn) => fn(val), initialVal)
+
 /*
 * BASE TIMER IMPLEMENTATION
 * Define methods common to all timer types
@@ -42,9 +44,10 @@ class TimerView {
 export default TimerView
 
 // Broadcast time changes using websockets
-function broadcast(data) {
-  const str = JSON.stringify(data)
-  socket.send(str)
+function broadcast(model) {
+  const time = compose(format, display)(model)
+  socket.send(time)
+  console.log(model)
 }
 
 // Play audio signals:

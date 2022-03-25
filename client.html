@@ -9,14 +9,13 @@
     <div class="flex timer" id='inner'></div>
   </div>
   <script type="module">
-    import {clockTime, display, format, onResize} from "./timer-views.js"
-    import {onResize}  from "./display-utils.js"
+    import {fullScreen, onResize} from "./display-utils.js"
 
     const socket = new WebSocket(`ws://${window.location.hostname}/sub`)
     const el     = document.getElementById('inner')
 
     // Main event loop
-    socket.onmessage = clockTime(el)
+    socket.onmessage = (event) => el.textContent = event.data
     // Resize text when the window size changes
     window.onresize = () => onResize(el)
   </script>

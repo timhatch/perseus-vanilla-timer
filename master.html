@@ -16,12 +16,11 @@
   </div>
   <script type="module">
     import {fullScreen, onResize} from "./display-utils.js"
-    import {clockTime}            from "./timer-views.js"
     import RotationTimer          from './timer-rotation.js'
 
     // Create a global clock instance
     var clock  = null
-    var sub    = new WebSocket(`ws://${window.location.hostname}/sub`)
+    var socket = new WebSocket(`ws://${window.location.hostname}/sub`)
     var el     = document.getElementById('inner')
 
     // Initialise the clock only where it doesn't already exist 
@@ -35,7 +34,7 @@
       }
     }
 
-    sub.onmessage = clockTime(el)
+    socket.onmessage = (event) => el.textContent = event.data
 
     // The main event loop
     document.addEventListener('DOMContentLoaded', function(){

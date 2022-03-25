@@ -24,15 +24,3 @@ export function display({remaining, climbing, preparation}) {
   // remaining time within the relevant period
   return remaining > preparation ? (remaining - preparation) : remaining
 }
-
-// Display time
-export function clockTime(el) {
-  return (event) => {
-    const opts     = JSON.parse(event.data) // Parse the `data` string
-    const time     = display({...opts})     // Calculate/format the time to be displayed
-    el.textContent = format(time)           // Display the time
-    // CHECK VALUES
-    console.log(opts)
-  }
-}
-
