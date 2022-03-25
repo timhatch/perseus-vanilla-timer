@@ -9,12 +9,14 @@ class CountdownTimer extends TimerView {
     // Bind and run the clock
     this.clock = this.run.bind(this)
     this.clock(null)
-    
+
+    // TODO: Refactor to use ws
     // Handle es messages
     const es     = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
   }
 
+  // TODO: Refactor to use ws
   // React to any Server Sent Event message fired by the server
   handleESMessage(eventsource) {
     const now      = parseFloat(eventsource.data)       // (float) milliseconds
