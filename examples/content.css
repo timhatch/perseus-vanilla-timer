@@ -43,6 +43,7 @@ html, body {
 
 #inner {
   font-family : Arial, sans-serif;
+  font-size   : 70vh;
   color       : white;
   text-align  : center;
   cursor      : none;
