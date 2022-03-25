@@ -15,17 +15,17 @@ class RotationTimer extends BaseTimer {
     super(options)
 
     // Define the rotation period
-    this.rotation = this.model.climbing + this.model.preparation
+    this.model.rotation = this.model.climbing + this.model.preparation
 
     // run the clock
     this.clock = this.run.bind(this)
-    this.clock(null)
+    this.clock(0)
   }
   
-  // Rotation countdown timer
+  // Override the `run` method from the BaseTimer class, looping using requestAnimationFrame
   run(timestamp) {
-    const now       = (this.model.start + timestamp) / 1000     // (float) seconds
-    const remaining = this.rotation - (now % this.rotation)     // (float) seconds
+    const now       = (this.model.start + timestamp) / 1000               // (float) seconds
+    const remaining = this.model.rotation - (now % this.model.rotation)   // (float) seconds
 
     super.run(remaining)
 
