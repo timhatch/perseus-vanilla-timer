@@ -1,6 +1,6 @@
 import AudioSignal, {AudioCTX} from "./audiosignal.js"
 
-import {format, display}       from "./timer-views.js"
+import {format, display}       from "./timer-utils.js"
 
 const compose = (...fns) => (initialVal) => fns.reduceRight((val, fn) => fn(val), initialVal)
 
