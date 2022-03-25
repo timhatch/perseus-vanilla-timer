@@ -8,14 +8,15 @@ const compose = (...fns) => (initialVal) => fns.reduceRight((val, fn) => fn(val)
 * BASE TIMER IMPLEMENTATION
 * Define methods common to all timer types
 */
+
 const audio = AudioCTX ? [425, 600].map((f) => new AudioSignal(f)) : null
 
 const socket = new WebSocket(`ws://${window.location.hostname}/pub`)
 
-// Class::TimerView
+// BaseTimer
 // A generic timer class 
-class TimerView {
-  
+class BaseTimer {
+  // Contructor
   constructor(options) {
     // Instantiate the timer model.
     const start       = Date.now()                        // (int) milliseconds
@@ -41,7 +42,7 @@ class TimerView {
   }
 }
 
-export default TimerView
+export default BaseTimer
 
 // Broadcast time changes using websockets
 function broadcast(model) {

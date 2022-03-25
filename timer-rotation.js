@@ -1,16 +1,17 @@
-import TimerView from './timer-baseclass.js'
+import BaseTimer from './timer-baseclass.js'
 
 /*
 * ROTATION TIMER IMPLEMENTATION
-* Implement a rolling countdown timer
+* Implement a non-interruptible rolling countdown timer
 */
 
-// Class::TimerView::RotationTimer
-// Sub-class timerview to run a simple rotating timer. Use requestAnimationFrame to run as close
-// as possible to the screen refresh rate
-class RotationTimer extends TimerView {
+// BaseTimer::RotationTimer
+// Sub-class timerview to run a simple rotating timer. 
+// Use requestAnimationFrame to run as close as possible to the screen refresh rate
+class RotationTimer extends BaseTimer {
   // Constructor
   constructor(options) {
+    // Instantiate the timer
     super(options)
 
     // Define the rotation period

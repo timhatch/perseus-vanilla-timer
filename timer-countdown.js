@@ -1,6 +1,15 @@
-import TimerView from './timer-baseclass.js'
+import BaseTimer from './timer-baseclass.js'
 
-class CountdownTimer extends TimerView {
+/*
+* ROTATION TIMER IMPLEMENTATION
+* Implement an interruptible countdown timer
+*/
+
+// BaseTimer::CountdownTimer
+// Sub-class timerview to run a simple rotating timer. 
+// Use requestAnimationFrame to run as close as possible to the screen refresh rate
+
+class CountdownTimer extends BaseTimer {
   // Constructor
   constructor(options) {
     // Instantiate the timer
@@ -11,7 +20,6 @@ class CountdownTimer extends TimerView {
     this.clock(null)
 
     // TODO: Refactor to use ws
-    // Handle es messages
     const es     = new EventSource('/timers/reset')
     es.onmessage = this.handleESMessage.bind(this)
   }
@@ -23,7 +31,7 @@ class CountdownTimer extends TimerView {
     this.model.end = now + ((this.model.end - now) > 0 ? 0 : (this.model.rotation * 1000) + 899)
   }
   
-  // Override the `run` method from the base TimerView class, looping using requestAnimationFrame
+  // Override the `run` method from the BaseTimer class, looping using requestAnimationFrame
   run(timestamp) {
     const now       = this.model.start + timestamp      // (float) milliseconds
     const diff      = (this.model.end - now) / 1000     // (float) seconds
@@ -31,6 +39,8 @@ class CountdownTimer extends TimerView {
 
     super.run(remaining)
     
+    // Use requestAnimationFrame() in preference to setTimeout(). requestAnimationFrame notionally runs locked
+    // to the screen refresh rate. Running faster than this is unnecessary.
     requestAnimationFrame(this.clock)
   }
 }
