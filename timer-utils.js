@@ -18,7 +18,7 @@ export function format(time) {
 // sig: (Hash) -> Double
 export function display({remaining, climbing, preparation}) {
   // If there's no time left in the rotation/attempt period, return the climbing time
-  if (!Math.floor(remaining)) return climbing
+  if (!Math.floor(remaining) && !!preparation) return climbing
 
   // Otherwise. calculate whether we're in the climbing or preparation period and return the
   // remaining time within the relevant period
