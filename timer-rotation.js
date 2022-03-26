@@ -23,15 +23,15 @@ class RotationTimer extends BaseTimer {
   }
   
   // Override the `run` method from the BaseTimer class, looping using requestAnimationFrame
-  run(timestamp) {
-    const now       = (this.model.start + timestamp) / 1000               // (float) seconds
+  run() {
+    const now       = Date.now() / 1000                                   // (float) seconds
     const remaining = this.model.rotation - (now % this.model.rotation)   // (float) seconds
 
     super.run(remaining)
 
     // Use requestAnimationFrame() in preference to setTimeout(). requestAnimationFrame notionally runs locked
     // to the screen refresh rate. Running faster than this is unnecessary.
-    requestAnimationFrame(this.clock)
+    setTimeout(this.clock, 1000)
   }
 }
 
