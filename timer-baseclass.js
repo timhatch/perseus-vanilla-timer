@@ -19,26 +19,25 @@ class BaseTimer {
   // Contructor
   constructor(options) {
     // Instantiate the timer model.
-    const start       = Date.now()                        // (int) milliseconds
     const climbing    = options.climbing   || 300         // (int) seconds
     const preparation = options.interval   || 0           // (int) seconds
-    const remaining   = climbing + preparation
+    const rotation    = climbing + preparation            // (int) seconds
+    const remaining   = rotation                          // (int) seconds
 
     // Model properties
-    this.model  = {climbing, preparation, start, remaining}
+    this.model  = {climbing, preparation, rotation, remaining}
   }
 
-  // Given a time in seconds, compare it with the stored time remaining on the clock and if
-  // the two are different (a) update the displayed time and (b) if audio is supported play any
-  // relevant audio signal
-  // The point here is to allow the clock to iterate multiple times per second, but only refresh
-  // the display when the number of seconds remaining changes
-  run(timestamp) {
-    if (Math.floor(timestamp) !== Math.floor(this.model.remaining)) {
-      this.model.remaining = timestamp
-      broadcast(this.model)
-      playSound(this.model)
-    }
+  // Given a `tick` value corresponding to the time in seconds:
+  // - set the remaining time
+  // - broadcast the model data
+  // - play any relevant sound
+  run(tick) {
+    if (tick < 0) return    // Ignore negative time (e.g. time-expired on a countdown clock)
+
+    this.model.remaining = tick
+    broadcast(this.model)
+    playSound(this.model)
   }
 }
 
@@ -48,7 +47,7 @@ export default BaseTimer
 function broadcast(model) {
   const time = compose(format, display)(model)
   socket.send(time)
-  console.log(model)
+  // console.log(model)
 }
 
 // Play audio signals:
@@ -56,8 +55,7 @@ function broadcast(model) {
 // - tone[0] / 325ms for each five second countdown
 function playSound(model) {
   if (AudioCTX) {
-    const r = display(model)
-    const t = Math.floor(r)
+    const t = display(model)
     if (t === 0 || t === 60 || t === model.climbing) audio[1].play(650)
     if (t < 6 && t > 0) audio[0].play(325)
   }

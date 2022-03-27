@@ -6,31 +6,29 @@ import BaseTimer from './timer-baseclass.js'
 */
 
 // BaseTimer::RotationTimer
-// Sub-class timerview to run a simple rotating timer. 
-// Use requestAnimationFrame to run as close as possible to the screen refresh rate
+// Sub-class timerview to run a simple rotating timer.
 class RotationTimer extends BaseTimer {
   // Constructor
   constructor(options) {
     // Instantiate the timer
     super(options)
 
-    // Define the rotation period
-    this.model.rotation = this.model.climbing + this.model.preparation
-
     // run the clock
     this.clock = this.run.bind(this)
-    this.clock(0)
+    this.clock()
   }
-  
-  // Override the `run` method from the BaseTimer class, looping using requestAnimationFrame
+
+  // Override the `run` method from the BaseTimer class
+  // Run the clock using a tick count rather than machine time. This obviates the need to
+  // correct for drift, but means that the clock is as accurate only as the executing
+  // interpreter. e.g. if the preceding code takes 1ms to run, then the effective interval
+  // between ticks will be 1000ms (from the setTimeout) + 1ms (for execution)
   run() {
-    const now       = Date.now() / 1000                                   // (float) seconds
-    const remaining = this.model.rotation - (now % this.model.rotation)   // (float) seconds
+    const tick = this.model.remaining
 
-    super.run(remaining)
+    super.run(tick)
+    this.model.remaining = tick - 1 || this.model.rotation  // (float) seconds
 
-    // Use requestAnimationFrame() in preference to setTimeout(). requestAnimationFrame notionally runs locked
-    // to the screen refresh rate. Running faster than this is unnecessary.
     setTimeout(this.clock, 1000)
   }
 }
