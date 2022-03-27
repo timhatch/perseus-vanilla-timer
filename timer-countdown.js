@@ -33,8 +33,11 @@ class CountdownTimer extends BaseTimer {
   }
 
   // Handle clock interrupts
+  // If the clock is running, then set model.remaining == 0 (i.e. stop the clock).
+  // If the clock is already stopped (model.remaining <= 0) then restart
   reset() {
-    this.model.remaining = this.model.rotation
+    const now = this.model.remaining
+    this.model.remaining = (now > 0) ? 0 : this.model.rotation
   }
 }
 
